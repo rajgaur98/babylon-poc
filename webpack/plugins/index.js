@@ -5,5 +5,4 @@ export * from './clean-webpack-plugin.js';
 export * from './dotenv-webpack-plugin.js';
 export * from './eslint-webpack-plugin.js';
 export * from './mini-css-extract-plugin.js';
-export * from './stylelint-webpack-plugin.js';
 export * from './image-minimizer-webpack-plugin.js';

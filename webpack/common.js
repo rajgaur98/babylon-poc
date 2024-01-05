@@ -4,7 +4,6 @@ import {
   copyWebpackPlugin,
   eSLintWebpackPlugin,
   dotenvWebpackPlugin,
-  styleLintWebpackPlugin,
 } from './plugins/index.js';
 import { paths, config } from '../configuration/index.js';
 import { css, fonts, images, javaScript, typeScript } from './modules/index.js';
@@ -31,7 +30,6 @@ const plugins = [
   copyWebpackPlugin,
   eSLintWebpackPlugin,
   dotenvWebpackPlugin,
-  styleLintWebpackPlugin,
 ];
 
 /**

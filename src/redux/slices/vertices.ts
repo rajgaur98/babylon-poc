@@ -1,3 +1,5 @@
+// redux slice for managing vertices and mode
+
 import {
   createSelector,
   createSlice,
@@ -5,6 +7,8 @@ import {
 } from '@reduxjs/toolkit';
 
 export interface State {
+  // we are using array instead of Vector3 because Vector3 is not serializable
+  // we can use Vector3 in the component and convert it to array before dispatching
   vertices: number[][][];
   mode: 'DRAW' | 'MOVE' | 'EDIT';
 }
@@ -58,16 +62,15 @@ export const {
   setVerticesGroupByIndex,
 } = verticesSlice.actions;
 
+// selectors
 export const selectMode = createSelector(
   (state: { vertices: State }) => state.vertices,
   (state) => state.mode,
 );
-
 export const selectVertices = createSelector(
   (state: { vertices: State }) => state.vertices,
   (state) => state.vertices,
 );
-
 export const selectLastVertices = createSelector(
   (state: { vertices: State }) => state.vertices,
   (state) => state.vertices[state.vertices.length - 1],

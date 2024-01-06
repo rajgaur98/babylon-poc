@@ -1,3 +1,5 @@
+// this file contains the logic for drawing on xz plane
+
 import {
   Vector3,
   type Nullable,
@@ -19,11 +21,13 @@ import { arrayToVector } from './helpers/arrayToVector';
 let vertices = selectLastVertices(getState());
 let mode = selectMode(getState());
 
+// sync state
 store.subscribe(() => {
   vertices = selectLastVertices(getState());
   mode = selectMode(getState());
 });
 
+// adds points on the ground
 const addPoints = (vertex?: Nullable<Vector3>): void => {
   if (vertex) {
     const vertex2D = new Vector3(vertex.x, 0, vertex.z);
@@ -31,16 +35,19 @@ const addPoints = (vertex?: Nullable<Vector3>): void => {
     sphere.position = vertex2D;
     sphere.material = pointMaterial;
 
+    // draw lines between vertices
     if (vertices.length > 0) {
       CreateLines('connector', {
         points: [arrayToVector(vertices[vertices.length - 1]), vertex2D],
       });
     }
 
+    // add vertex to state
     dispatch(addVerticesToLastVertex(vertex2D.asArray()));
   }
 };
 
+// connects the last vertex to the first vertex
 const closeShape = (): void => {
   if (vertices.length <= 2) return;
   CreateLines('connector', {
@@ -50,9 +57,11 @@ const closeShape = (): void => {
     ],
   });
 
+  // add new vertex to state to start a new shape
   dispatch(addVertex([]));
 };
 
+// take action based on pointer events
 scene.onPointerObservable.add((pointerInfo) => {
   if (mode !== 'DRAW') return;
 

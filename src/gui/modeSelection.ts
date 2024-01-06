@@ -1,8 +1,12 @@
+// GUI setup for showing mode selection buttons
+
 import { adt } from '@/constants';
 import { selectMode, setMode } from '@/redux/slices/vertices';
 import { dispatch, getState, store } from '@/redux/store';
 import { Button, Control, StackPanel } from '@babylonjs/gui';
 
+// toggle button styles based on mode
+// this helps in showing which mode is selected
 store.subscribe(() => {
   const mode = selectMode(getState());
   createBtn.background = mode === 'DRAW' ? 'black' : 'white';
@@ -40,6 +44,7 @@ editBtn.color = 'black';
 editBtn.background = 'white';
 panel.addControl(editBtn);
 
+// set mode based on button click
 createBtn.onPointerClickObservable.add((pointerInfo) => {
   if (pointerInfo.buttonIndex === 0) {
     dispatch(setMode('DRAW'));

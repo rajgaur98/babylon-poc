@@ -2,7 +2,6 @@ import {
   Vector3,
   type Nullable,
   CreateSphere,
-  Mesh,
   PointerEventTypes,
   AbstractMesh,
 } from '@babylonjs/core';
@@ -25,7 +24,6 @@ import { getGroundPosition } from './helpers/getGroundPosition';
 
 // local state
 let isDrawn = false;
-const vertexEditClues: Nullable<Mesh>[] = [];
 let draggedMesh: Nullable<AbstractMesh> = null;
 let dragStartPoint: Nullable<Vector3> = null;
 
@@ -33,10 +31,14 @@ let dragStartPoint: Nullable<Vector3> = null;
 let allVertices = selectVertices(getState());
 let mode = selectMode(getState());
 
+// we keep a copy of the vertices to avoid mutating the state
+// this copy will be updated when the vertexes are dragged
+// we will dispatch the updated vertices to the state when the drag ends
 let clonedVertices: Vector3[][] = allVertices.map((vertices) =>
   vertices.map((vertex) => arrayToVector(vertex)),
 );
 
+// sync state
 store.subscribe(() => {
   allVertices = selectVertices(getState());
   mode = selectMode(getState());
@@ -46,11 +48,13 @@ store.subscribe(() => {
   );
 
   if (mode === 'EDIT') {
+    // show vertices when the mode is edit
     if (!isDrawn) {
       showVertices();
     }
     isDrawn = true;
   } else {
+    // hide vertices when the mode is not edit
     isDrawn = false;
     for (let i = 0; i < allVertices.length; i += 1) {
       for (let j = 0; j < allVertices[i].length; j += 1) {
@@ -60,6 +64,7 @@ store.subscribe(() => {
   }
 });
 
+// helper for showing vertices
 const showVertices = (): void => {
   for (let i = 0; i < allVertices.length; i += 1) {
     const vertices = allVertices[i];
@@ -69,7 +74,6 @@ const showVertices = (): void => {
       const sphere = CreateSphere(`vertex-${i}-${j}`, { diameter: 0.5 }, scene);
       sphere.position = vertex2D;
       sphere.material = vertexMaterial;
-      vertexEditClues?.push(sphere);
     }
   }
 };
@@ -92,14 +96,18 @@ const handleMoveDrag = (): void => {
 
       const magnitude = diff.length();
 
+      // get index of the dragged vertex
       const [i, j] = draggedMesh.name.split('-').slice(1).map(Number);
+      // update the local copy of the vertices
       clonedVertices[i][j] = new Vector3(
         draggedMesh.position.x,
         0,
         draggedMesh.position.z,
       );
 
+      // not worth re-rendering if the change is too small
       if (magnitude >= 0.02) {
+        // re-render the polygons with the updated vertices
         extrudePolygon(clonedVertices, false);
       }
     }
@@ -109,6 +117,7 @@ const handleMoveDrag = (): void => {
 const handleEndDrag = (): void => {
   if (draggedMesh) {
     const [i, j] = draggedMesh.name.split('-').slice(1).map(Number);
+    // update the state with the new vertex position
     dispatch(
       setVerticesByIndex({
         i,
@@ -125,9 +134,12 @@ const handleEndDrag = (): void => {
   camera.attachControl(canvas, true);
   dragStartPoint = null;
   draggedMesh = null;
+
+  // re-render the polygons with the updated vertices
   extrudePolygon(clonedVertices, false);
 };
 
+// event listeners
 scene.onPointerObservable.add((pointerInfo) => {
   if (mode !== 'EDIT') return;
 

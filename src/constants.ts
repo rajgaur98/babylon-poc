@@ -1,3 +1,5 @@
+// this file is for storing constants and BabylonJS Meshes, Materials, Scenes, etc.
+
 import {
   ArcRotateCamera,
   Color3,
@@ -17,10 +19,9 @@ export const canvas = document.querySelector('canvas');
 // Associate a Babylon Engine to it.
 export const engine = new Engine(canvas);
 
-// Create our first scene.
 export const scene = new Scene(engine);
 
-/**** Set camera and light *****/
+// Set camera and light
 export const camera = new ArcRotateCamera(
   'camera',
   Math.PI / 2.5,

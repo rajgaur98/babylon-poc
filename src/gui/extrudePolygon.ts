@@ -1,9 +1,12 @@
+// GUI setup for showing extrude button
+
 import { adt } from '@/constants';
 import { extrudePolygon } from '@/extrude';
 import { selectMode } from '@/redux/slices/vertices';
 import { getState, store } from '@/redux/store';
 import { Button, Control, StackPanel } from '@babylonjs/gui';
 
+// toggle button visibility based on mode
 store.subscribe(() => {
   const mode = selectMode(getState());
   button.isVisible = mode === 'DRAW';

@@ -1,3 +1,5 @@
+// get ground position wrt xz plane
+
 import { scene } from '@/constants';
 import type { Vector3 } from '@babylonjs/core';
 

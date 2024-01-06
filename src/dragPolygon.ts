@@ -1,3 +1,5 @@
+// this file is responsible for moving/dragging the polygon
+
 import {
   AbstractMesh,
   PointerEventTypes,
@@ -27,7 +29,7 @@ let allVertices = selectVertices(getState());
 let dragStartPoint: Nullable<Vector3> = null;
 let draggedMesh: Nullable<AbstractMesh> = null;
 
-// update state
+// sync state
 store.subscribe(() => {
   mode = selectMode(getState());
   allVertices = selectVertices(getState());
@@ -36,6 +38,7 @@ store.subscribe(() => {
 const handleStartDrag = (mesh: AbstractMesh): void => {
   if (mesh) {
     camera.detachControl();
+    // change color of the mesh when it is dragged
     mesh.material = polygonFocusMaterial;
     draggedMesh = mesh;
     dragStartPoint = getGroundPosition();
@@ -46,6 +49,7 @@ const handleMoveDrag = (): void => {
   if (draggedMesh && dragStartPoint) {
     const currentPoint = getGroundPosition();
     if (currentPoint) {
+      // add the difference between two points to the mesh position
       const diff = currentPoint.subtract(dragStartPoint);
       draggedMesh.position.addInPlace(diff);
       dragStartPoint = currentPoint;
@@ -55,21 +59,32 @@ const handleMoveDrag = (): void => {
 
 const handleEndDrag = (): void => {
   if (draggedMesh) {
+    // reset the color of the mesh
     draggedMesh.material = polygonMaterial;
   }
+
+  // attach camera back
   camera.attachControl(canvas, true);
+
+  // save the new vertices to state
   updateVertices();
+
+  // reset local state
   draggedMesh = null;
   dragStartPoint = null;
 };
 
 const updateVertices = (): void => {
   if (draggedMesh) {
+    // index of the polygon from the array of shapes
     const index = Number(draggedMesh.name.split('-')[1]);
     const positions = draggedMesh.getPositionData();
+
+    // update the vertices of that specific polygon/shape
     dispatch(
       setVerticesGroupByIndex({
         i: index,
+        // extract the vertices on xz plane from the positions array
         // @ts-expect-error weird type error
         vertices: positions?.slice(0, allVertices[index].length).map((_, i) => {
           return [
@@ -83,6 +98,7 @@ const updateVertices = (): void => {
   }
 };
 
+// listen to pointer events
 scene.onPointerObservable.add((pointerInfo) => {
   if (mode !== 'MOVE') return;
 

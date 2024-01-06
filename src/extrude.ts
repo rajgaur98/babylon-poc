@@ -1,20 +1,24 @@
 import { POLYGON_HEIGHT, polygonMaterial, scene } from '@/constants';
 import { selectVertices } from '@/redux/slices/vertices';
 import { getState, store } from '@/redux/store';
-import { ExtrudePolygon, Mesh, type Nullable } from '@babylonjs/core';
+import { ExtrudePolygon } from '@babylonjs/core';
 import earcut from 'earcut';
 import { arrayToVector } from './helpers/arrayToVector';
 
-// localstate
-const drawnPolygons: Nullable<Mesh>[] = [];
-
 // state
-let vertices = selectVertices(getState());
+let vertices = selectVertices(getState()).map((vertices) =>
+  vertices.map((vertex) => arrayToVector(vertex)),
+);
 
+// sync state
 store.subscribe(() => {
-  vertices = selectVertices(getState());
+  vertices = selectVertices(getState()).map((vertices) =>
+    vertices.map((vertex) => arrayToVector(vertex)),
+  );
 });
 
+// dispose the points and lines on the ground
+// after extruding the polygon
 const disposeCurrentVertices = (): void => {
   scene.getMeshesById('vertex').forEach((mesh) => {
     mesh.dispose();
@@ -25,12 +29,10 @@ const disposeCurrentVertices = (): void => {
 };
 
 export const extrudePolygon = (
-  customVertices = vertices.map((vertices) =>
-    vertices.map((vertex) => arrayToVector(vertex)),
-  ),
+  customVertices = vertices,
   clearVertices = true,
 ): void => {
-  // clear the previous screen
+  // clear the previously drawn polygons
   for (let i = 0; i < customVertices.length; i += 1) {
     scene.getMeshById(`polygon-${i}`)?.dispose();
   }
@@ -50,7 +52,6 @@ export const extrudePolygon = (
     );
     polygon.position.y = POLYGON_HEIGHT;
     polygon.material = polygonMaterial;
-    drawnPolygons.push(polygon);
   }
 
   clearVertices && disposeCurrentVertices();

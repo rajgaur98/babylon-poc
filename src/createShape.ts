@@ -2,35 +2,34 @@ import {
   Vector3,
   type Nullable,
   CreateSphere,
-  StandardMaterial,
-  Color3,
   Mesh,
-  ExtrudePolygon,
   PointerEventTypes,
+  CreateLines,
 } from '@babylonjs/core';
 import { dispatch, getState, store } from './redux/store';
 import {
   addVertex,
+  addVerticesToLastVertex,
+  selectConnectors,
+  selectLastVertices,
+  selectMode,
   selectRenderedShape,
-  selectVertices,
+  setConnectors,
   setRenderedShape,
-  setVertices,
 } from './redux/slices/vertices';
-import earcut from 'earcut';
-import { ground, scene } from './constants';
-
-const POLYGON_HEIGHT = 2.5;
-
-const polygonMaterial = new StandardMaterial('yellow', scene);
-polygonMaterial.diffuseColor = new Color3(1, 0, 0);
+import { polygonMaterial, scene } from './constants';
 
 // state
-let vertices = selectVertices(getState());
+let vertices = selectLastVertices(getState());
 let renderedShape = selectRenderedShape(getState());
+let connectors = selectConnectors(getState());
+let mode = selectMode(getState());
 
 store.subscribe(() => {
-  vertices = selectVertices(getState());
+  vertices = selectLastVertices(getState());
   renderedShape = selectRenderedShape(getState());
+  connectors = selectConnectors(getState());
+  mode = selectMode(getState());
 });
 
 const addPoints = (vertex?: Nullable<Vector3>): void => {
@@ -39,7 +38,19 @@ const addPoints = (vertex?: Nullable<Vector3>): void => {
     const sphere = CreateSphere('vertex', { diameter: 0.2 }, scene);
     sphere.position = vertex2D;
     sphere.material = polygonMaterial;
-    dispatch(addVertex(vertex2D));
+
+    if (vertices.length > 0) {
+      const line = CreateLines('connector', {
+        points: [vertices[vertices.length - 1], vertex2D],
+      });
+      if (connectors) {
+        dispatch(setConnectors(Mesh.MergeMeshes([connectors, line])));
+      } else {
+        dispatch(setConnectors(line));
+      }
+    }
+
+    dispatch(addVerticesToLastVertex(vertex2D));
     if (renderedShape) {
       dispatch(setRenderedShape(Mesh.MergeMeshes([renderedShape, sphere])));
     } else {
@@ -48,31 +59,24 @@ const addPoints = (vertex?: Nullable<Vector3>): void => {
   }
 };
 
-const disposeCurrentVertices = (): void => {
-  renderedShape?.dispose();
-  dispatch(setRenderedShape(null));
-};
-
-const extrudePolygon = (): void => {
+const closeShape = (): void => {
   if (vertices.length <= 2) return;
-  const polygon = ExtrudePolygon(
-    'polygon',
-    {
-      shape: [...vertices, vertices[0]],
-      depth: POLYGON_HEIGHT,
-    },
-    scene,
-    earcut,
-  );
-  polygon.parent = ground;
-  polygon.position.y = POLYGON_HEIGHT;
-  polygon.material = polygonMaterial;
+  const line = CreateLines('connector', {
+    points: [vertices[vertices.length - 1], vertices[0]],
+  });
 
-  dispatch(setVertices([]));
-  disposeCurrentVertices();
+  if (connectors) {
+    dispatch(setConnectors(Mesh.MergeMeshes([connectors, line])));
+  } else {
+    dispatch(setConnectors(line));
+  }
+
+  dispatch(addVertex([]));
 };
 
 scene.onPointerObservable.add((pointerInfo) => {
+  if (mode !== 'DRAW') return;
+
   switch (pointerInfo.type) {
     case PointerEventTypes.POINTERTAP:
       if (pointerInfo.event.button === 0) {
@@ -81,7 +85,7 @@ scene.onPointerObservable.add((pointerInfo) => {
       break;
     case PointerEventTypes.POINTERUP:
       if (pointerInfo.event.button === 2) {
-        extrudePolygon();
+        closeShape();
       }
       break;
   }

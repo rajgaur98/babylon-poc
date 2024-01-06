@@ -8,8 +8,11 @@ import {
 import {
   selectDragStartPoint,
   selectDraggedMesh,
+  selectMode,
+  selectVertices,
   setDragStartPoint,
   setDraggedMesh,
+  setVerticesGroupByIndex,
 } from './redux/slices/vertices';
 import { dispatch, getState, store } from './redux/store';
 import { camera, canvas, scene } from './constants';
@@ -17,11 +20,15 @@ import { camera, canvas, scene } from './constants';
 // state
 let dragStartPoint = selectDragStartPoint(getState());
 let draggedMesh = selectDraggedMesh(getState());
+let mode = selectMode(getState());
+let allVertices = selectVertices(getState());
 
 // update state
 store.subscribe(() => {
   dragStartPoint = selectDragStartPoint(getState());
   draggedMesh = selectDraggedMesh(getState());
+  mode = selectMode(getState());
+  allVertices = selectVertices(getState());
 });
 
 // materials
@@ -63,16 +70,39 @@ const handleMoveDrag = (): void => {
 
 const handleEndDrag = (): void => {
   camera.attachControl(canvas, true);
+  updateVertices();
   dispatch(setDraggedMesh(null));
   dispatch(setDragStartPoint(null));
 };
 
+const updateVertices = (): void => {
+  if (draggedMesh) {
+    const index = Number(draggedMesh.name.split('-')[1]);
+    const positions = draggedMesh.getPositionData();
+    dispatch(
+      setVerticesGroupByIndex({
+        i: index,
+        // @ts-expect-error weird type error
+        vertices: positions?.slice(0, allVertices[index].length).map((_, i) => {
+          return new Vector3(
+            positions[i * 3] + draggedMesh!.position.x,
+            positions[i * 3 + 1],
+            positions[i * 3 + 2] + draggedMesh!.position.z,
+          );
+        }),
+      }),
+    );
+  }
+};
+
 scene.onPointerObservable.add((pointerInfo) => {
+  if (mode !== 'MOVE') return;
+
   switch (pointerInfo.type) {
     case PointerEventTypes.POINTERDOWN:
       if (
         pointerInfo.pickInfo?.hit &&
-        pointerInfo.pickInfo.pickedMesh?.name === 'polygon'
+        pointerInfo.pickInfo.pickedMesh?.name.startsWith('polygon')
       ) {
         handleStartDrag(pointerInfo.pickInfo.pickedMesh);
       }

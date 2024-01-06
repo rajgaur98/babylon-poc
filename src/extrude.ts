@@ -1,34 +1,26 @@
 import { POLYGON_HEIGHT, polygonMaterial, scene } from '@/constants';
-import {
-  selectConnectors,
-  selectRenderedShape,
-  selectVertices,
-  setConnectors,
-  setRenderedShape,
-} from '@/redux/slices/vertices';
-import { dispatch, getState, store } from '@/redux/store';
+import { selectVertices } from '@/redux/slices/vertices';
+import { getState, store } from '@/redux/store';
 import { ExtrudePolygon, Mesh, type Nullable } from '@babylonjs/core';
 import earcut from 'earcut';
 
 // localstate
-let drawnPolygons: Nullable<Mesh>[] = [];
+const drawnPolygons: Nullable<Mesh>[] = [];
 
 // state
 let vertices = selectVertices(getState());
-let renderedShape = selectRenderedShape(getState());
-let connectors = selectConnectors(getState());
 
 store.subscribe(() => {
   vertices = selectVertices(getState());
-  renderedShape = selectRenderedShape(getState());
-  connectors = selectConnectors(getState());
 });
 
 const disposeCurrentVertices = (): void => {
-  renderedShape?.dispose();
-  connectors?.dispose();
-  dispatch(setRenderedShape(null));
-  dispatch(setConnectors(null));
+  scene.getMeshesById('vertex').forEach((mesh) => {
+    mesh.dispose();
+  });
+  scene.getMeshesById('connector').forEach((mesh) => {
+    mesh.dispose();
+  });
 };
 
 export const extrudePolygon = (
@@ -36,8 +28,9 @@ export const extrudePolygon = (
   clearVertices = true,
 ): void => {
   // clear the previous screen
-  drawnPolygons.forEach((polygon) => polygon?.dispose());
-  drawnPolygons = [];
+  for (let i = 0; i < customVertices.length; i += 1) {
+    scene.getMeshById(`polygon-${i}`)?.dispose();
+  }
 
   for (let i = 0; i < customVertices.length; i += 1) {
     const vertex = customVertices[i];

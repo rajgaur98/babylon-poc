@@ -16,14 +16,14 @@ import {
   POLYGON_HEIGHT,
   camera,
   canvas,
-  polygonMaterial,
   scene,
+  vertexMaterial,
 } from './constants';
 import { extrudePolygon } from './extrude';
 
 // local state
 let isDrawn = false;
-let vertexEditClues: Nullable<Mesh>[] = [];
+const vertexEditClues: Nullable<Mesh>[] = [];
 let draggedMesh: Nullable<AbstractMesh> = null;
 let dragStartPoint: Nullable<Vector3> = null;
 
@@ -50,8 +50,11 @@ store.subscribe(() => {
     isDrawn = true;
   } else {
     isDrawn = false;
-    vertexEditClues?.forEach((vertex) => vertex?.dispose());
-    vertexEditClues = [];
+    for (let i = 0; i < allVertices.length; i += 1) {
+      for (let j = 0; j < allVertices[i].length; j += 1) {
+        scene.getMeshById(`vertex-${i}-${j}`)?.dispose();
+      }
+    }
   }
 });
 
@@ -61,9 +64,9 @@ const showVertices = (): void => {
     for (let j = 0; j < vertices.length; j += 1) {
       const vertex = vertices[j];
       const vertex2D = new Vector3(vertex.x, POLYGON_HEIGHT, vertex.z);
-      const sphere = CreateSphere(`vertex-${i}-${j}`, { diameter: 0.2 }, scene);
+      const sphere = CreateSphere(`vertex-${i}-${j}`, { diameter: 0.5 }, scene);
       sphere.position = vertex2D;
-      sphere.material = polygonMaterial;
+      sphere.material = vertexMaterial;
       vertexEditClues?.push(sphere);
     }
   }

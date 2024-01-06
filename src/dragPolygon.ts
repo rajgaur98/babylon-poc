@@ -1,39 +1,36 @@
 import {
   AbstractMesh,
-  Color3,
   PointerEventTypes,
-  StandardMaterial,
   Vector3,
+  type Nullable,
 } from '@babylonjs/core';
 import {
-  selectDragStartPoint,
-  selectDraggedMesh,
   selectMode,
   selectVertices,
-  setDragStartPoint,
-  setDraggedMesh,
   setVerticesGroupByIndex,
 } from './redux/slices/vertices';
 import { dispatch, getState, store } from './redux/store';
-import { camera, canvas, scene } from './constants';
+import {
+  camera,
+  canvas,
+  polygonFocusMaterial,
+  polygonMaterial,
+  scene,
+} from './constants';
 
 // state
-let dragStartPoint = selectDragStartPoint(getState());
-let draggedMesh = selectDraggedMesh(getState());
 let mode = selectMode(getState());
 let allVertices = selectVertices(getState());
 
+// local state
+let dragStartPoint: Nullable<Vector3> = null;
+let draggedMesh: Nullable<AbstractMesh> = null;
+
 // update state
 store.subscribe(() => {
-  dragStartPoint = selectDragStartPoint(getState());
-  draggedMesh = selectDraggedMesh(getState());
   mode = selectMode(getState());
   allVertices = selectVertices(getState());
 });
-
-// materials
-const polygonMaterial = new StandardMaterial('yellow', scene);
-polygonMaterial.diffuseColor = new Color3(1, 0, 0);
 
 // actions
 const getGroundPosition = (): Vector3 | null => {
@@ -52,8 +49,9 @@ const getGroundPosition = (): Vector3 | null => {
 const handleStartDrag = (mesh: AbstractMesh): void => {
   if (mesh) {
     camera.detachControl();
-    dispatch(setDraggedMesh(mesh));
-    dispatch(setDragStartPoint(getGroundPosition()));
+    mesh.material = polygonFocusMaterial;
+    draggedMesh = mesh;
+    dragStartPoint = getGroundPosition();
   }
 };
 
@@ -63,16 +61,19 @@ const handleMoveDrag = (): void => {
     if (currentPoint) {
       const diff = currentPoint.subtract(dragStartPoint);
       draggedMesh.position.addInPlace(diff);
-      dispatch(setDragStartPoint(currentPoint));
+      dragStartPoint = currentPoint;
     }
   }
 };
 
 const handleEndDrag = (): void => {
+  if (draggedMesh) {
+    draggedMesh.material = polygonMaterial;
+  }
   camera.attachControl(canvas, true);
   updateVertices();
-  dispatch(setDraggedMesh(null));
-  dispatch(setDragStartPoint(null));
+  draggedMesh = null;
+  dragStartPoint = null;
 };
 
 const updateVertices = (): void => {

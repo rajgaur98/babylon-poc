@@ -12,7 +12,7 @@ import {
   setDraggedMesh,
 } from './redux/slices/vertices';
 import { dispatch, getState, store } from './redux/store';
-import { camera, canvas, scene } from '.';
+import { camera, canvas, scene } from './constants';
 
 // state
 let dragStartPoint = selectDragStartPoint(getState());

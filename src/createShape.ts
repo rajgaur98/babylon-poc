@@ -8,7 +8,6 @@ import {
   ExtrudePolygon,
   PointerEventTypes,
 } from '@babylonjs/core';
-import { ground, scene } from '.';
 import { dispatch, getState, store } from './redux/store';
 import {
   addVertex,
@@ -18,6 +17,7 @@ import {
   setVertices,
 } from './redux/slices/vertices';
 import earcut from 'earcut';
+import { ground, scene } from './constants';
 
 const POLYGON_HEIGHT = 2.5;
 

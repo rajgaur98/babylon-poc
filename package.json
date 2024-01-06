@@ -109,6 +109,9 @@
     "@babylonjs/core": "^6.37.1",
     "@babylonjs/gui": "^6.37.1",
     "@babylonjs/inspector": "^6.37.1",
-    "@babylonjs/materials": "^6.37.1"
+    "@babylonjs/materials": "^6.37.1",
+    "@reduxjs/toolkit": "^2.0.1",
+    "@types/earcut": "^2.1.4",
+    "earcut": "^2.2.4"
   }
 }

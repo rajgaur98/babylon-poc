@@ -2,7 +2,7 @@
 
 ## Live demo
 
-https://babylon-poc.vercel.app/
+https://babylon-poc.netlify.app/
 
 ## Local Setup
 

@@ -3,6 +3,7 @@ import { selectVertices } from '@/redux/slices/vertices';
 import { getState, store } from '@/redux/store';
 import { ExtrudePolygon, Mesh, type Nullable } from '@babylonjs/core';
 import earcut from 'earcut';
+import { arrayToVector } from './helpers/arrayToVector';
 
 // localstate
 const drawnPolygons: Nullable<Mesh>[] = [];
@@ -24,7 +25,9 @@ const disposeCurrentVertices = (): void => {
 };
 
 export const extrudePolygon = (
-  customVertices = vertices,
+  customVertices = vertices.map((vertices) =>
+    vertices.map((vertex) => arrayToVector(vertex)),
+  ),
   clearVertices = true,
 ): void => {
   // clear the previous screen

@@ -20,6 +20,8 @@ import {
   vertexMaterial,
 } from './constants';
 import { extrudePolygon } from './extrude';
+import { arrayToVector } from './helpers/arrayToVector';
+import { getGroundPosition } from './helpers/getGroundPosition';
 
 // local state
 let isDrawn = false;
@@ -32,7 +34,7 @@ let allVertices = selectVertices(getState());
 let mode = selectMode(getState());
 
 let clonedVertices: Vector3[][] = allVertices.map((vertices) =>
-  vertices.map((vertex) => vertex.clone()),
+  vertices.map((vertex) => arrayToVector(vertex)),
 );
 
 store.subscribe(() => {
@@ -40,7 +42,7 @@ store.subscribe(() => {
   mode = selectMode(getState());
 
   clonedVertices = allVertices.map((vertices) =>
-    vertices.map((vertex) => vertex.clone()),
+    vertices.map((vertex) => arrayToVector(vertex)),
   );
 
   if (mode === 'EDIT') {
@@ -62,7 +64,7 @@ const showVertices = (): void => {
   for (let i = 0; i < allVertices.length; i += 1) {
     const vertices = allVertices[i];
     for (let j = 0; j < vertices.length; j += 1) {
-      const vertex = vertices[j];
+      const vertex = arrayToVector(vertices[j]);
       const vertex2D = new Vector3(vertex.x, POLYGON_HEIGHT, vertex.z);
       const sphere = CreateSphere(`vertex-${i}-${j}`, { diameter: 0.5 }, scene);
       sphere.position = vertex2D;
@@ -70,20 +72,6 @@ const showVertices = (): void => {
       vertexEditClues?.push(sphere);
     }
   }
-};
-
-// actions
-const getGroundPosition = (): Vector3 | null => {
-  const pickinfo = scene.pick(
-    scene.pointerX,
-    scene.pointerY,
-    (mesh) => mesh.name === 'ground1',
-  );
-  if (pickinfo.hit) {
-    return pickinfo.pickedPoint;
-  }
-
-  return null;
 };
 
 const handleStartDrag = (mesh: AbstractMesh): void => {
@@ -125,7 +113,11 @@ const handleEndDrag = (): void => {
       setVerticesByIndex({
         i,
         j,
-        vertex: new Vector3(draggedMesh.position.x, 0, draggedMesh.position.z),
+        vertex: new Vector3(
+          draggedMesh.position.x,
+          0,
+          draggedMesh.position.z,
+        ).asArray(),
       }),
     );
   }

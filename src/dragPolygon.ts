@@ -17,6 +17,7 @@ import {
   polygonMaterial,
   scene,
 } from './constants';
+import { getGroundPosition } from './helpers/getGroundPosition';
 
 // state
 let mode = selectMode(getState());
@@ -31,20 +32,6 @@ store.subscribe(() => {
   mode = selectMode(getState());
   allVertices = selectVertices(getState());
 });
-
-// actions
-const getGroundPosition = (): Vector3 | null => {
-  const pickinfo = scene.pick(
-    scene.pointerX,
-    scene.pointerY,
-    (mesh) => mesh.name === 'ground1',
-  );
-  if (pickinfo.hit) {
-    return pickinfo.pickedPoint;
-  }
-
-  return null;
-};
 
 const handleStartDrag = (mesh: AbstractMesh): void => {
   if (mesh) {
@@ -85,12 +72,12 @@ const updateVertices = (): void => {
         i: index,
         // @ts-expect-error weird type error
         vertices: positions?.slice(0, allVertices[index].length).map((_, i) => {
-          return new Vector3(
+          return [
             positions[i * 3] + draggedMesh!.position.x,
             positions[i * 3 + 1],
             positions[i * 3 + 2] + draggedMesh!.position.z,
-          );
-        }),
+          ];
+        }) as number[][],
       }),
     );
   }

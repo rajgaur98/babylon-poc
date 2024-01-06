@@ -13,6 +13,7 @@ import {
   selectMode,
 } from './redux/slices/vertices';
 import { pointMaterial, scene } from './constants';
+import { arrayToVector } from './helpers/arrayToVector';
 
 // state
 let vertices = selectLastVertices(getState());
@@ -32,18 +33,21 @@ const addPoints = (vertex?: Nullable<Vector3>): void => {
 
     if (vertices.length > 0) {
       CreateLines('connector', {
-        points: [vertices[vertices.length - 1], vertex2D],
+        points: [arrayToVector(vertices[vertices.length - 1]), vertex2D],
       });
     }
 
-    dispatch(addVerticesToLastVertex(vertex2D));
+    dispatch(addVerticesToLastVertex(vertex2D.asArray()));
   }
 };
 
 const closeShape = (): void => {
   if (vertices.length <= 2) return;
   CreateLines('connector', {
-    points: [vertices[vertices.length - 1], vertices[0]],
+    points: [
+      arrayToVector(vertices[vertices.length - 1]),
+      arrayToVector(vertices[0]),
+    ],
   });
 
   dispatch(addVertex([]));

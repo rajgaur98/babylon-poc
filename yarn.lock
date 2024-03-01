@@ -1029,10 +1029,10 @@
   resolved "https://registry.yarnpkg.com/@babylonjs/core/-/core-6.37.1.tgz#83f26356276a0dcc7c12f0d500a7a4445b8089c4"
   integrity sha512-KQLh8pesJce6W8WxYlGP+IzYem6lphYf4f6KPc1ut2pfKgJ0fFvh2jKFWqENDXkom1nIeHNbzMCf2yXqTj020w==
 
-"@babylonjs/gui-editor@^6.37.1":
-  version "6.37.1"
-  resolved "https://registry.yarnpkg.com/@babylonjs/gui-editor/-/gui-editor-6.37.1.tgz#e004c4ed7aa1a52fcbf40e37a3a7574847e48bcd"
-  integrity sha512-iSZBawzMwt0oe5smT8q5KBc7Vl2oMFLRcUjAxiUi4UvltVBqNvc941sUUfM/RvzmziqpeyrPsRUiy1IhBYdeOQ==
+"@babylonjs/gui-editor@^6.45.1":
+  version "6.45.1"
+  resolved "https://registry.yarnpkg.com/@babylonjs/gui-editor/-/gui-editor-6.45.1.tgz#b410c74458aa98449e50cdfb7111ada2056415f5"
+  integrity sha512-o3Hjb+2SKEVVu6iBAlwT5GX1AqAogA7VAi9QHUxy9ZImPMa79qfdkuESKFyH+HIfQixBsEEaLcB3gQAsfMIB7A==
 
 "@babylonjs/gui@^6.37.1":
   version "6.37.1"

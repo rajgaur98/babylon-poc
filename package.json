@@ -54,7 +54,7 @@
     "@babel/register": "^7.22.15",
     "@babylonjs/gui-editor": "^6.37.1",
     "@babylonjs/loaders": "^6.37.1",
-    "@babylonjs/serializers": "^6.37.1",
+    "@babylonjs/serializers": "^6.45.1",
     "@types/jest": "^29.5.10",
     "@typescript-eslint/eslint-plugin": "^6.13.1",
     "@typescript-eslint/parser": "^6.13.1",

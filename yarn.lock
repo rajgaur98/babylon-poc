@@ -1058,10 +1058,10 @@
   resolved "https://registry.yarnpkg.com/@babylonjs/materials/-/materials-6.37.1.tgz#32c02841a096ebd6228ea7ce8e5582c5b6f8fc07"
   integrity sha512-/13NBVFIEzp7Nhdr8naB5ucwphMa6crqG+DCtIFAVTOPqAKqDOhkCY6afDMndmKT0D8E/1Z/ADbwsnlwOqbCcA==
 
-"@babylonjs/serializers@^6.37.1":
-  version "6.37.1"
-  resolved "https://registry.yarnpkg.com/@babylonjs/serializers/-/serializers-6.37.1.tgz#7cf256318aa3a4c043d3f69bb1ac2bfef1d504af"
-  integrity sha512-FVzw/qHQwa0GJNxw69UF4QNLIMjGJjW0pqbY2kis4DiBI8cwBkjtmzlVyMxT4PWffaSVBnNbncfRcNKUVZwgtg==
+"@babylonjs/serializers@^6.45.1":
+  version "6.45.1"
+  resolved "https://registry.yarnpkg.com/@babylonjs/serializers/-/serializers-6.45.1.tgz#27c9a2ed8236651d8f144bda810f23d861e20862"
+  integrity sha512-iSPUdjZhQIbSyi21IFiFC/wm6Bj4zcH9NhsN9i+xqLTbO/Uho49cHU0ew39n0Xn+LRsGRMTJWQLTsp+TPvAvrw==
 
 "@bcoe/v8-coverage@^0.2.3":
   version "0.2.3"
